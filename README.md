@@ -1,5 +1,7 @@
 # Test-repository-automation-38
 
+Тест 1
+
 import org.junit.Test;
 
 public class MainClass
