@@ -1,6 +1,6 @@
 # Test-repository-automation-38
 
-Тест 1
+Test 1
 
 import org.junit.Test;
 
