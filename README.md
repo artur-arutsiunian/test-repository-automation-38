@@ -1,17 +1,19 @@
 # Test-repository-automation-38
 
-Test 1
+Test 2
 
 import org.junit.Test;
 
-public class MainClass
-{
-    @Test
-    public void getLocalNumber()
-    {
-    int number = 14;
+public class MainClass {
+    private void class_number() {
+        int number = 20;
         System.out.println(number);
-}
+    }
+
+    @Test
+    public void getClassNumber() {
+        this.class_number();
+    }
 }
 
 
@@ -20,13 +22,18 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class MainClassTest
-{
-  @Test
-      public void testGetLocalNumber ()
-      {
-          int expected = 14;
-          int actual = 14;
 
-          Assert.assertTrue("if less or more = fail", actual == expected);
-      }
-  }
+{
+    @Test
+    public void testGetClassNumber ()
+    {
+        int expected = 46;
+        int actual = 45;
+        Assert.assertTrue("Warning! Your expected result equal actual", expected > actual);
+        if (expected <= actual) {
+            System.out.println("Must be more or equal 45");
+        } else {
+            System.out.println("This is correct result");
+        }
+    }
+}
