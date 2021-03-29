@@ -1,20 +1,14 @@
 # Test-repository-automation-38
 
-Test 3
 
 import org.junit.Test;
 
-public class MainClass
-{
-    private void class_string()
-    {
-        System.out.println("Hello, world");
-    }
+public class MainClass {
 
-    @Test
-    public void getClassString()
-    {
-        this.class_string();
+    public static int getLocalNumber() {
+        int number = 14;
+        System.out.println(number);
+        return number;
     }
 }
 
@@ -23,12 +17,17 @@ public class MainClass
 import org.junit.Assert;
 import org.junit.Test;
 
-public class MainClassTest
+public class MainClassTest {
 
-{
+
     @Test
-    public void testGetClassString (String[] args)
-    {
 
+        public void testGetLocalNumber2() {
+            int expected = 14;
+            int actual  = MainClass.getLocalNumber();
+            Assert.assertTrue( "if less or more = fail",actual == expected);
     }
+
 }
+
+
