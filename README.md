@@ -1,17 +1,16 @@
 # Test-repository-automation-38
 
-
 import org.junit.Test;
+
 
 public class MainClass {
 
-    public static int getLocalNumber() {
-        int number = 14;
-        System.out.println(number);
-        return number;
+    private static int class_number = 45;
+
+    public static int getClassNumber() {
+        return class_number;
     }
 }
-
 
 
 import org.junit.Assert;
@@ -19,15 +18,11 @@ import org.junit.Test;
 
 public class MainClassTest {
 
-
     @Test
-
-        public void testGetLocalNumber2() {
-            int expected = 14;
-            int actual  = MainClass.getLocalNumber();
-            Assert.assertTrue( "if less or more = fail",actual == expected);
+    public void testGetLocalNumber() {
+        int actual  = MainClass.getClassNumber();
+        Assert.assertTrue( "if less = fail",actual >= 45);
     }
 
+
 }
-
-
