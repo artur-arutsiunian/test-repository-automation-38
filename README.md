@@ -2,15 +2,15 @@
 
 import org.junit.Test;
 
-
 public class MainClass {
 
-    private static int class_number = 45;
+    private static String class_string = "Hello world";
 
-    public static int getClassNumber() {
-        return class_number;
+    public static String getClassString() {
+        return class_string;
     }
 }
+
 
 
 import org.junit.Assert;
@@ -19,10 +19,9 @@ import org.junit.Test;
 public class MainClassTest {
 
     @Test
-    public void testGetLocalNumber() {
-        int actual  = MainClass.getClassNumber();
-        Assert.assertTrue( "if less = fail",actual >= 45);
+    public void testGetClassString() {
+        String actual  = MainClass.getClassString();
+        Assert.assertTrue( "if not Hello",actual.contains("Hello") || actual.contains("hello1"));
     }
-
 
 }
