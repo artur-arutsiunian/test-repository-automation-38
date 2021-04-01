@@ -1,27 +1,44 @@
 # Test-repository-automation-38
 
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
-public class MainClass {
+import java.net.URL;
 
-    private static String class_string = "Hello world";
+public class FirstTest {
 
-    public static String getClassString() {
-        return class_string;
+    private AppiumDriver driver;
+
+    @Before
+    public void setUp() throws Exception
+    {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+
+        capabilities.setCapability("platformName","Android");
+        capabilities.setCapability("deviceName","AndroidTestDevice");
+        capabilities.setCapability("platformVersion","8.0");
+        capabilities.setCapability("automationName","Appium");
+        capabilities.setCapability("appPackage","org.wikipedia");
+        capabilities.setCapability("appActivity",".main.MainActivity");
+        capabilities.setCapability("app","/Users/arturarutsiunian/Desktop/JavaAppiumAutomation/apks/org.wikipedia.apk");
+
+        driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"),capabilities);
     }
-}
 
-
-
-import org.junit.Assert;
-import org.junit.Test;
-
-public class MainClassTest {
+    @After
+    public void tearDown()
+    {
+        driver.quit();
+    }
 
     @Test
-    public void testGetClassString() {
-        String actual  = MainClass.getClassString();
-        Assert.assertTrue( "if not Hello",actual.contains("Hello") || actual.contains("hello1"));
+    public void firstTest()
+    {
+        System.out.println("First test run");
     }
-
 }
+  
