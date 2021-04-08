@@ -50,16 +50,16 @@ public class FirstTest {
 
         waitForElementByXpathAndSendKeys(
                 "//*[contains(@text,'Search…')]",
-                "Google",
+                "",
                 "Cannot find search input",
                 5
         );
 
-        waitForElementPresentByXpath(
-                "//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='Web product from Google Inc. which provides detailed ground imagery']",
-                "Cannot find 'Web product from Google Inc. which provides detailed ground imagery' topic searching by 'Google'",
-                15
-        );
+        //waitForElementPresentByXpath(
+         //       "//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='Web product from Google Inc. which provides detailed ground imagery']",
+         //       "Cannot find 'Web product from Google Inc. which provides detailed ground imagery' topic searching by 'Google'",
+          //      15
+        //);
     }
 
 
@@ -92,3 +92,4 @@ public class FirstTest {
         return element;
     }
 }
+
