@@ -4,106 +4,101 @@ package lib.ui;
 
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 
-public class ArticlePageObject extends MainPageObject{
+public class MyListsPageObject extends MainPageObject{
 
-    private static final String
-    TITLE = "org.wikipedia:id/view_page_title_text",
-    OPTIONS_BUTTON = "//android.widget.ImageView[@content-desc='More options']",
-    OPTIONS_ADD_TO_MY_LIST_BUTTON = "//*[@text='Add to reading list']",
-    ADD_TO_MY_LIST_OVERLAY = "org.wikipedia:id/onboarding_button",
-    MY_LIST_NAME_INPUT = "org.wikipedia:id/text_input",
-    MY_LIST_OK_BUTTON = "//*[@text='OK']",
-    ADD_TO_EXISTING_FOLDER = "org.wikipedia:id/item_container",
-    CLOSE_ARTICLE_BUTTON = "//android.widget.ImageButton[@content-desc='Navigate up']";
+    public static final String
+    FOLDER_BY_NAME_TPL = "//*[@text='{FOLDER_NAME}']",
+    ARTICLE_BY_TITLE_TPL = "//*[@text='TITLE']",
+    WAIT_SECOND_ELEMENT = "//*[@resource-id='org.wikipedia:id/page_list_item_container']",
+    CLICK_ON_SECOND_ELEMENT = "//*[@resource-id='org.wikipedia:id/page_list_item_container']",
+    ASSERT_SURE = "org.wikipedia:id/view_page_title_text",
+    CLICK_IN_EX6 = "//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='IPhone']",
+    IMMEDIATELY_ASSERT = "//*[@text='IPhone']";
 
-    public ArticlePageObject(AppiumDriver driver)
+    private static String getFolderXpathByName(String name_of_folder)
+    {
+        return FOLDER_BY_NAME_TPL.replace("{FOLDER_NAME}", name_of_folder);
+    }
+
+    private static String getSavedArticleXpathByTitle(String article_title)
+    {
+        return ARTICLE_BY_TITLE_TPL.replace("{TITLE}", article_title);
+    }
+
+    public MyListsPageObject(AppiumDriver driver)
     {
         super(driver);
     }
 
-    public WebElement waitForTitleElement()
+    public void openFolderByName(String name_of_folder)
     {
-        return this.waitForElementPresent(By.id(TITLE),"Cannot find title article on page", 15);
-    }
-
-    public String getArticleTitle()
-    {
-        WebElement title_element = waitForTitleElement();
-        return title_element.getAttribute("text");
-    }
-
-    public void addArticleToMyList(String name_of_folder)
-    {
+        String folder_name_xpath = getFolderXpathByName(name_of_folder);
         this.waitForElementAndClick(
-                By.xpath(OPTIONS_BUTTON),
-                "Cannot find button to open article options",
+                By.xpath(folder_name_xpath),
+                "Cannot find folder by name" + name_of_folder,
                 5
-        );
-
-
-        this.waitForElementAndClick(
-                By.xpath(OPTIONS_ADD_TO_MY_LIST_BUTTON),
-                "Cannot find options to add article to reading list",
-                5
-        );
-
-        this.waitForElementAndClick(
-                By.id(ADD_TO_MY_LIST_OVERLAY),
-                "Cannot find 'Got it' tip overlay",
-                5
-        );
-
-        this.waitForElementAndClear(
-                By.id(MY_LIST_NAME_INPUT),
-                "Cannot find input to set name of articles folder",
-                5
-        );
-
-        this.waitForElementAndSendKeys(
-                By.id(MY_LIST_NAME_INPUT),
-                name_of_folder,
-                "Cannot put text into articles folder input",
-                5
-        );
-
-        this.waitForElementAndClick(
-                By.xpath(MY_LIST_OK_BUTTON),
-                "Cannot press OK button",
-                0
         );
     }
 
-    public void addArticleToMyList1(String name_of_folder)
+    public void waitForArticleToAppearByTitle(String article_title)
     {
-        this.waitForElementAndClick(
-                By.xpath(OPTIONS_BUTTON),
-                "Cannot find button to open article options",
-                5
-        );
-
-
-        this.waitForElementAndClick(
-                By.xpath(OPTIONS_ADD_TO_MY_LIST_BUTTON),
-                "Cannot find options to add article to reading list",
-                5
-        );
-
-        this.waitForElementAndClick(
-                By.id(ADD_TO_EXISTING_FOLDER),
-                "Cannot find existing folder",
-                5
-        );
-
+        String article_xpath = getFolderXpathByName(article_title);
+        this.waitForElementPresent(By.xpath(article_xpath), "Cannot find saved article by title" + article_title, 15);
     }
 
-    public void closeArticle()
+    public void swipeByArticleToDelete(String article_title)
+    {
+        this.waitForArticleToAppearByTitle(article_title);
+        String article_xpath = getFolderXpathByName(article_title);
+        this.swipeElementToLeft(
+                By.xpath(article_xpath),
+                "Cannot find saved article"
+        );
+    }
+
+    public void waitForSecondElement()
+    {
+        this.waitForElementPresent(
+                By.xpath(WAIT_SECOND_ELEMENT),
+                "Cannot find 'Search Google' input",
+                5
+        );
+    }
+
+    public void clickOnSecondElement()
     {
         this.waitForElementAndClick(
-                By.xpath(CLOSE_ARTICLE_BUTTON),
-                "Cannot close article, cannot find X link",
-                0
+                By.xpath(CLICK_ON_SECOND_ELEMENT),
+                "Cannot find already created folder",
+                5
+        );
+    }
+
+    public void sure_element_has_title()
+    {
+        this.assertElementHasTitle(
+                By.id(ASSERT_SURE),
+                "Java (programming language)",
+                "We see unexpected result"
+        );
+    }
+
+    public void click_in_assert_title()
+    {
+        this.waitForElementAndClick(
+                By.xpath(CLICK_IN_EX6),
+                "Cannot find 'IPhone' article in search",
+                5
+        );
+    }
+
+    public void immediately_assert_element()
+    {
+        this.assertElementPresent(
+                By.xpath(IMMEDIATELY_ASSERT),
+                "Cannot find the end of the article",
+                1
         );
     }
 }
