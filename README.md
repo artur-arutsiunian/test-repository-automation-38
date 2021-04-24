@@ -4,98 +4,106 @@ package lib.ui;
 
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
-public class SearchPageObject extends MainPageObject{
+public class ArticlePageObject extends MainPageObject{
 
     private static final String
-    SEARCH_INIT_ELEMENT = "org.wikipedia:id/search_container",
-    SEARCH_INPUT = "org.wikipedia:id/search_src_text",
-    SEARCH_RESULT = "//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='Object-oriented programming language']",
-    SEARCH_CLEAR = "org.wikipedia:id/search_src_text",
-    SEARCH_CANCEL_BUTTON = "org.wikipedia:id/search_close_btn",
-    SEARCH_RESULT_BY_SUBSTRING_TPL= "//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='{SUBSTRING}']",
-    SEARCH_RESULT_ELEMENT = "//*[@resource-id='org.wikipedia:id/search_results_list']/*[@resource-id='org.wikipedia:id/page_list_item_container']",
-    SEARCH_EMPTY_RESULT_ELEMENT = "//*[@text='No results found]";
+    TITLE = "org.wikipedia:id/view_page_title_text",
+    OPTIONS_BUTTON = "//android.widget.ImageView[@content-desc='More options']",
+    OPTIONS_ADD_TO_MY_LIST_BUTTON = "//*[@text='Add to reading list']",
+    ADD_TO_MY_LIST_OVERLAY = "org.wikipedia:id/onboarding_button",
+    MY_LIST_NAME_INPUT = "org.wikipedia:id/text_input",
+    MY_LIST_OK_BUTTON = "//*[@text='OK']",
+    ADD_TO_EXISTING_FOLDER = "org.wikipedia:id/item_container",
+    CLOSE_ARTICLE_BUTTON = "//android.widget.ImageButton[@content-desc='Navigate up']";
 
-
-    public SearchPageObject(AppiumDriver driver)
+    public ArticlePageObject(AppiumDriver driver)
     {
         super(driver);
     }
 
-    /* TEMPLATE METHODS */
-    private static String getResultSearchElement(String substring)
+    public WebElement waitForTitleElement()
     {
-        return SEARCH_RESULT_BY_SUBSTRING_TPL.replace("{SUBSTRING}", substring);
-    }
-    /* TEMPLATE METHODS */
-
-    public void initSearchInput()
-    {
-        this.waitForElementAndClick(By.id(SEARCH_INIT_ELEMENT),"Cannot find and click search init element", 5);
-        this.waitForElementPresent(By.id(SEARCH_INIT_ELEMENT), "Cannot find search input after clicking search init element");
+        return this.waitForElementPresent(By.id(TITLE),"Cannot find title article on page", 15);
     }
 
-    public void waitSearchResult()
+    public String getArticleTitle()
     {
-        this.waitForElementPresent(By.xpath(SEARCH_RESULT), "cannot find search result", 5);
+        WebElement title_element = waitForTitleElement();
+        return title_element.getAttribute("text");
     }
 
-    public void waitForClear()
+    public void addArticleToMyList(String name_of_folder)
     {
-        this.waitForElementAndClear(By.id(SEARCH_CLEAR), "cannot clear", 5);
-    }
-
-    public void waitForCancelButtonToAppear()
-    {
-        this.waitForElementPresent(By.id(SEARCH_CANCEL_BUTTON), "cannot find search cancel button", 5);
-    }
-
-    public void waitForCancelButtonToDisappear()
-    {
-        this.waitForElementNotPresent(By.id(SEARCH_CANCEL_BUTTON), "search cancel button is still present", 5);
-    }
-
-    public void clickCancelSearch()
-    {
-        this.waitForElementAndClick(By.id(SEARCH_CANCEL_BUTTON), "Cannot find click search cancel button",5);
-    }
-
-    public void typeSearchLine(String search_line)
-    {
-        this.waitForElementAndSendKeys(By.id(SEARCH_INPUT), search_line, "Cannot find and type into search input", 5);
-    }
-
-    public void clickByArticleWithSubstring(String substring)
-    {
-        String search_result_id = getResultSearchElement(substring);
-        this.waitForElementAndClick(By.xpath(search_result_id), "Cannot find and click search result with substring " + substring, 10);
-    }
-
-    public void waitForSearchResult(String substring)
-    {
-        String search_result_id = getResultSearchElement(substring);
-        this.waitForElementPresent(By.xpath(search_result_id), "Cannot find search result with substring " + substring);
-    }
-
-    public int getAmountOfFoundArticles()
-    {
-        this.waitForElementPresent(
-                By.xpath(SEARCH_RESULT_ELEMENT),
-                "Cannot find anything by the request",
-                15
+        this.waitForElementAndClick(
+                By.xpath(OPTIONS_BUTTON),
+                "Cannot find button to open article options",
+                5
         );
-            return this.getAmountOfElements(By.xpath(SEARCH_RESULT_ELEMENT));
+
+
+        this.waitForElementAndClick(
+                By.xpath(OPTIONS_ADD_TO_MY_LIST_BUTTON),
+                "Cannot find options to add article to reading list",
+                5
+        );
+
+        this.waitForElementAndClick(
+                By.id(ADD_TO_MY_LIST_OVERLAY),
+                "Cannot find 'Got it' tip overlay",
+                5
+        );
+
+        this.waitForElementAndClear(
+                By.id(MY_LIST_NAME_INPUT),
+                "Cannot find input to set name of articles folder",
+                5
+        );
+
+        this.waitForElementAndSendKeys(
+                By.id(MY_LIST_NAME_INPUT),
+                name_of_folder,
+                "Cannot put text into articles folder input",
+                5
+        );
+
+        this.waitForElementAndClick(
+                By.xpath(MY_LIST_OK_BUTTON),
+                "Cannot press OK button",
+                0
+        );
     }
 
-    public void waitForEmptyResultsLabel()
+    public void addArticleToMyList1(String name_of_folder)
     {
-        this.waitForElementPresent(By.xpath(SEARCH_EMPTY_RESULT_ELEMENT),"Cannot find empty result element,", 15);
+        this.waitForElementAndClick(
+                By.xpath(OPTIONS_BUTTON),
+                "Cannot find button to open article options",
+                5
+        );
+
+
+        this.waitForElementAndClick(
+                By.xpath(OPTIONS_ADD_TO_MY_LIST_BUTTON),
+                "Cannot find options to add article to reading list",
+                5
+        );
+
+        this.waitForElementAndClick(
+                By.id(ADD_TO_EXISTING_FOLDER),
+                "Cannot find existing folder",
+                5
+        );
 
     }
 
-    public void assertThereIsResultsOfSearch()
+    public void closeArticle()
     {
-        this.assertElementNotPresent(By.xpath(SEARCH_RESULT_ELEMENT),"We supposed not find any results");
+        this.waitForElementAndClick(
+                By.xpath(CLOSE_ARTICLE_BUTTON),
+                "Cannot close article, cannot find X link",
+                0
+        );
     }
 }
