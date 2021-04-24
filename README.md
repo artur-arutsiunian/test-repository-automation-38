@@ -3,179 +3,99 @@
 package lib.ui;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.TouchAction;
-import org.junit.Assert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.List;
+public class SearchPageObject extends MainPageObject{
 
-public class MainPageObject {
+    private static final String
+    SEARCH_INIT_ELEMENT = "org.wikipedia:id/search_container",
+    SEARCH_INPUT = "org.wikipedia:id/search_src_text",
+    SEARCH_RESULT = "//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='Object-oriented programming language']",
+    SEARCH_CLEAR = "org.wikipedia:id/search_src_text",
+    SEARCH_CANCEL_BUTTON = "org.wikipedia:id/search_close_btn",
+    SEARCH_RESULT_BY_SUBSTRING_TPL= "//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='{SUBSTRING}']",
+    SEARCH_RESULT_ELEMENT = "//*[@resource-id='org.wikipedia:id/search_results_list']/*[@resource-id='org.wikipedia:id/page_list_item_container']",
+    SEARCH_EMPTY_RESULT_ELEMENT = "//*[@text='No results found]";
 
-    protected AppiumDriver driver;
 
-    public MainPageObject(AppiumDriver driver)
+    public SearchPageObject(AppiumDriver driver)
     {
-        this.driver = driver;
+        super(driver);
     }
 
-    public WebElement waitForElementPresent(By by, String error_message, long timeoutInSeconds)
+    /* TEMPLATE METHODS */
+    private static String getResultSearchElement(String substring)
     {
-        WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
-        wait.withMessage(error_message + "\n");
-        return wait.until(
-                ExpectedConditions.presenceOfElementLocated(by)
+        return SEARCH_RESULT_BY_SUBSTRING_TPL.replace("{SUBSTRING}", substring);
+    }
+    /* TEMPLATE METHODS */
+
+    public void initSearchInput()
+    {
+        this.waitForElementAndClick(By.id(SEARCH_INIT_ELEMENT),"Cannot find and click search init element", 5);
+        this.waitForElementPresent(By.id(SEARCH_INIT_ELEMENT), "Cannot find search input after clicking search init element");
+    }
+
+    public void waitSearchResult()
+    {
+        this.waitForElementPresent(By.xpath(SEARCH_RESULT), "cannot find search result", 5);
+    }
+
+    public void waitForClear()
+    {
+        this.waitForElementAndClear(By.id(SEARCH_CLEAR), "cannot clear", 5);
+    }
+
+    public void waitForCancelButtonToAppear()
+    {
+        this.waitForElementPresent(By.id(SEARCH_CANCEL_BUTTON), "cannot find search cancel button", 5);
+    }
+
+    public void waitForCancelButtonToDisappear()
+    {
+        this.waitForElementNotPresent(By.id(SEARCH_CANCEL_BUTTON), "search cancel button is still present", 5);
+    }
+
+    public void clickCancelSearch()
+    {
+        this.waitForElementAndClick(By.id(SEARCH_CANCEL_BUTTON), "Cannot find click search cancel button",5);
+    }
+
+    public void typeSearchLine(String search_line)
+    {
+        this.waitForElementAndSendKeys(By.id(SEARCH_INPUT), search_line, "Cannot find and type into search input", 5);
+    }
+
+    public void clickByArticleWithSubstring(String substring)
+    {
+        String search_result_id = getResultSearchElement(substring);
+        this.waitForElementAndClick(By.xpath(search_result_id), "Cannot find and click search result with substring " + substring, 10);
+    }
+
+    public void waitForSearchResult(String substring)
+    {
+        String search_result_id = getResultSearchElement(substring);
+        this.waitForElementPresent(By.xpath(search_result_id), "Cannot find search result with substring " + substring);
+    }
+
+    public int getAmountOfFoundArticles()
+    {
+        this.waitForElementPresent(
+                By.xpath(SEARCH_RESULT_ELEMENT),
+                "Cannot find anything by the request",
+                15
         );
+            return this.getAmountOfElements(By.xpath(SEARCH_RESULT_ELEMENT));
     }
 
-    public WebElement waitForElementPresent(By by, String error_message)
+    public void waitForEmptyResultsLabel()
     {
-        return waitForElementPresent(by, error_message, 5);
+        this.waitForElementPresent(By.xpath(SEARCH_EMPTY_RESULT_ELEMENT),"Cannot find empty result element,", 15);
+
     }
 
-    public WebElement waitForElementAndClick(By by, String error_message, long timeoutInSeconds)
+    public void assertThereIsResultsOfSearch()
     {
-        WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
-        element.click();
-        return element;
-    }
-
-    public WebElement waitForElementAndSendKeys(By by, String value, String error_message, long timeoutInSeconds)
-    {
-        WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
-        element.sendKeys(value);
-        return element;
-    }
-
-
-
-    public boolean waitForElementNotPresent(By by, String error_message, long timeoutInSeconds)
-    {
-        WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
-        wait.withMessage(error_message + "\n");
-        return wait.until(
-                ExpectedConditions.invisibilityOfElementLocated(by)
-        );
-    }
-
-    public WebElement waitForElementAndClear(By by, String error_message, long timeoutInSeconds)
-    {
-        WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
-        element.clear();
-        return element;
-    }
-
-    public WebElement assertElementHasTitle(By by, String expected_text, String error_message){
-        WebElement titleElement = waitForElementPresent(by, error_message);
-        String article_title = titleElement.getAttribute("text");
-        Assert.assertEquals(
-                error_message,
-                expected_text,
-                article_title
-        );
-        return titleElement;
-    }
-
-    public WebElement assertElementHasText(By by, String expected_text, String error_message){
-        WebElement titleElement = waitForElementPresent(by, error_message);
-        String article_title = titleElement.getAttribute("text");
-        Assert.assertEquals(
-                error_message,
-                expected_text,
-                article_title
-        );
-        return titleElement;
-    }
-
-    public void SwipeUp(int timeOfSwipe)
-    {
-        TouchAction action = new TouchAction(driver);
-        Dimension size = driver.manage().window().getSize();
-        int x = size.width / 2;
-        int start_y = (int) (size.height * 0.8);
-        int end_y = (int) (size.height * 0.2);
-
-
-        action
-                .press(x, start_y)
-                .waitAction(timeOfSwipe)
-                .moveTo(x, end_y)
-                .release()
-                .perform();
-    }
-
-    public void swipeUpQuick()
-    {
-        SwipeUp(200);
-    }
-
-    public void  assertElementPresent(By by, String error_message, int max_element)
-    {
-        int already_present = 1;
-        while (driver.findElements(by).size() == 1){
-
-            if(already_present == max_element){
-                waitForElementPresent(by, "Cannot find element. \n" + error_message, 0);
-                return;
-            }
-
-//            swipeUpQuick();
-//            ++already_present;
-        }
-    }
-
-    public void swipeElementToLeft(By by, String error_message)
-    {
-        WebElement element = waitForElementPresent(
-                by,
-                error_message,
-                30);
-
-        int left_x = element.getLocation().getX();
-        int right_x = left_x + element.getSize().getWidth();
-        int upper_y = element.getLocation().getY();
-        int lower_y = upper_y + element.getSize().getWidth();
-        int middle_y = (upper_y + lower_y) / 2;
-
-        TouchAction action = new TouchAction(driver);
-        action
-                .press(right_x,  middle_y)
-                .waitAction(300)
-                .moveTo(left_x, middle_y)
-                .release()
-                .perform();
-    }
-
-    public int getAmountOfElements(By by)
-    {
-        List elements = driver.findElements(by);
-        return elements.size();
-    }
-
-    public void assertElementNotPresent(By by, String error_message)
-    {
-        int amount_of_elements = getAmountOfElements(by);
-        if (amount_of_elements > 0) {
-            String default_message = "An element '" + by.toString() + "' supposed to be not present";
-            throw new AssertionError(default_message + "" + error_message);
-        }
-    }
-
-    public String waitForElementAndGetAttribute(By by, String attribute, String error_message, long timeoutInSeconds)
-    {
-        WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
-        return element.getAttribute(attribute);
-    }
-
-    public WebElement waitForElementVisible(By by, String error_message, long timeoutInSeconds)
-    {
-        WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
-        wait.withMessage("\n " + error_message + "\n");
-        return wait.until(
-                ExpectedConditions.visibilityOfElementLocated(by)
-        );
+        this.assertElementNotPresent(By.xpath(SEARCH_RESULT_ELEMENT),"We supposed not find any results");
     }
 }
