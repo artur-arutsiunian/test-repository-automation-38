@@ -1,104 +1,67 @@
 # Test-repository-automation-38
 
-package lib.ui;
-
-import io.appium.java_client.AppiumDriver;
-import org.openqa.selenium.By;
-
-public class MyListsPageObject extends MainPageObject{
-
-    public static final String
-    FOLDER_BY_NAME_TPL = "//*[@text='{FOLDER_NAME}']",
-    ARTICLE_BY_TITLE_TPL = "//*[@text='TITLE']",
-    WAIT_SECOND_ELEMENT = "//*[@resource-id='org.wikipedia:id/page_list_item_container']",
-    CLICK_ON_SECOND_ELEMENT = "//*[@resource-id='org.wikipedia:id/page_list_item_container']",
-    ASSERT_SURE = "org.wikipedia:id/view_page_title_text",
-    CLICK_IN_EX6 = "//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='IPhone']",
-    IMMEDIATELY_ASSERT = "//*[@text='IPhone']";
-
-    private static String getFolderXpathByName(String name_of_folder)
+@Test
+    public void testCancelSearch()
     {
-        return FOLDER_BY_NAME_TPL.replace("{FOLDER_NAME}", name_of_folder);
+        SearchPageObject SearchPageObject = new SearchPageObject(driver);
+
+        SearchPageObject.initSearchInput();
+        SearchPageObject.typeSearchLine("Java");
+        SearchPageObject.waitSearchResult();
+        SearchPageObject.waitForClear();
+        SearchPageObject.waitForCancelButtonToAppear();
+        SearchPageObject.clickCancelSearch();
+        SearchPageObject.waitForCancelButtonToDisappear();
     }
 
-    private static String getSavedArticleXpathByTitle(String article_title)
-    {
-        return ARTICLE_BY_TITLE_TPL.replace("{TITLE}", article_title);
-    }
+    @Test
+    public void testAssertTitle() {
+        SearchPageObject SearchPageObject = new SearchPageObject(driver);
 
-    public MyListsPageObject(AppiumDriver driver)
-    {
-        super(driver);
+        SearchPageObject.initSearchInput();
+        SearchPageObject.typeSearchLine("Iphone");
+        MyListsPageObject MyListPageObject = new MyListsPageObject(driver);
+        MyListPageObject.click_in_assert_title();
+        ArticlePageObject ArticlePageObject = new ArticlePageObject(driver);
+        ArticlePageObject.waitForTitleElement();
+        MyListPageObject.immediately_assert_element();
     }
+    
+    @Test
+       public void testSaveFirstArticleToMyList()
+       {
+       SearchPageObject SearchPageObject = new SearchPageObject(driver);
 
-    public void openFolderByName(String name_of_folder)
-    {
-        String folder_name_xpath = getFolderXpathByName(name_of_folder);
-        this.waitForElementAndClick(
-                By.xpath(folder_name_xpath),
-                "Cannot find folder by name" + name_of_folder,
-                5
-        );
-    }
+       SearchPageObject.initSearchInput();
+       SearchPageObject.typeSearchLine("Java");
+       SearchPageObject.clickByArticleWithSubstring("Object-oriented programming language");
 
-    public void waitForArticleToAppearByTitle(String article_title)
-    {
-        String article_xpath = getFolderXpathByName(article_title);
-        this.waitForElementPresent(By.xpath(article_xpath), "Cannot find saved article by title" + article_title, 15);
-    }
 
-    public void swipeByArticleToDelete(String article_title)
-    {
-        this.waitForArticleToAppearByTitle(article_title);
-        String article_xpath = getFolderXpathByName(article_title);
-        this.swipeElementToLeft(
-                By.xpath(article_xpath),
-                "Cannot find saved article"
-        );
-    }
+       ArticlePageObject ArticlePageObject = new ArticlePageObject(driver);
+       ArticlePageObject.waitForTitleElement();
+       String article_title = ArticlePageObject.getArticleTitle();
+       String name_of_folder = "My folder";
+       ArticlePageObject.addArticleToMyList(name_of_folder);
+       ArticlePageObject.closeArticle();
 
-    public void waitForSecondElement()
-    {
-        this.waitForElementPresent(
-                By.xpath(WAIT_SECOND_ELEMENT),
-                "Cannot find 'Search Google' input",
-                5
-        );
-    }
+       SearchPageObject.initSearchInput();
+       SearchPageObject.typeSearchLine("Macbook");
+       SearchPageObject.clickByArticleWithSubstring("Intel-based line of Macintosh notebook computers");
 
-    public void clickOnSecondElement()
-    {
-        this.waitForElementAndClick(
-                By.xpath(CLICK_ON_SECOND_ELEMENT),
-                "Cannot find already created folder",
-                5
-        );
-    }
 
-    public void sure_element_has_title()
-    {
-        this.assertElementHasTitle(
-                By.id(ASSERT_SURE),
-                "Java (programming language)",
-                "We see unexpected result"
-        );
-    }
+       ArticlePageObject.waitForTitleElement();
+       String article_title1 = ArticlePageObject.getArticleTitle();
+       ArticlePageObject.addArticleToMyList1(name_of_folder);
+       ArticlePageObject.closeArticle();
 
-    public void click_in_assert_title()
-    {
-        this.waitForElementAndClick(
-                By.xpath(CLICK_IN_EX6),
-                "Cannot find 'IPhone' article in search",
-                5
-        );
-    }
+           NavigationUI NavigationUI = new NavigationUI(driver);
+         NavigationUI.ClickMyList();
 
-    public void immediately_assert_element()
-    {
-        this.assertElementPresent(
-                By.xpath(IMMEDIATELY_ASSERT),
-                "Cannot find the end of the article",
-                1
-        );
-    }
-}
+           MyListsPageObject MyListPageObject = new MyListsPageObject(driver);
+           MyListPageObject.openFolderByName(name_of_folder);
+           MyListPageObject.swipeByArticleToDelete(article_title);
+           MyListPageObject.waitForSecondElement();
+           MyListPageObject.clickOnSecondElement();
+           int amount_of_search_results = MainPageObject.getAmountOfElements(
+                   By.id("org.wikipedia:id/view_page_title_text")
+           );
